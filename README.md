@@ -1,34 +1,35 @@
 # RockPaperScissorLizardSpock
-README
+
+NOTE: In the frontend of the game use 'r' to reset the scoreboard anytime.
 
 Locations
-
-gameAPI
-
-a) Docker:  shikharadroit/dockerhub:rock_paper_scissor_l_s
-b) Github: git…
-
-Front-End: git……..
+1. Backend:
+	a) Get docker image from dockerhub.
+	Docker tag link:  shikharadroit/dockerhub:rock_paper_scissor_l_s
+	
+2. Front-End: File_name: front_end.html
 
 Instructions to install and run the project
-1. GameAPI:
-	a) Pull the docker image from dockerhub → docker pull 					    shikharadroit/dockerhub:rock_paper_scissor_l_s
-
-	 b) Run the docker container
+1. To run backend server:   
+	a) Pull the docker image from dockerhub → docker pull shikharadroit/dockerhub:rock_paper_scissor_l_s
+        b) Run the docker container
 	    sudo docker run -d -p 5000:5000 shikharadroit/dockerhub:rock_paper_scissor_l_s
 
 C: Now the server should be up and running
 
 2. Run front-End
 	GIT clone
-	Go to the directory location
-	To run the page: front_end_filename <>google-chrome frontIdx.html
+	In the terminal: Go to the directory location of the file : front_end.html
+	Command to run the front-end page in the browser of your choice: <browser of choice> front_end.html
+	example: google-chrome frontIdx.html
 
-0.0.0.0 → local host
-Enjoy the game.
+3. In the front-end, in step 1, where asked to put a URL use: http://0.0.0.0:5000
+4. Follow the steps on the page to play.
+
+Enjoy the game......
 
 Files
-1. Client-front
+1. Client-front: front_end.html
 2. Server-backend
 		GameAPI.py : Has game logic
 		HelperMethods.py : Has supporting methods used by gamelogic
