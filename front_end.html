@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>RPSLS</title>
+
+    <meta charset="UTF-8" />
+    <script
+      src="https://code.jquery.com/jquery-3.4.1.js"
+      integrity="sha256-WpOohJOqMqqyKL9FccASB9O0KwACQJpFTUBLTYOVvVU="
+      crossorigin="anonymous"
+    ></script>
+  </head>
+
+  <body style="background-color:coral">
+<!--<body style="background-image: url('https://cdn.shopify.com/s/files/1/0969/9128/products/Big_Bang_Theory_-_Bazinga_96f9ccf3-e6cf-493d-adca-6cd657144a6f.jpg?v=1514028631');">-->
+
+  <h1>Rock Paper Scissors Lizard Spock</h1>
+    <H3>Step 1: Put your root URL here</H3>
+    <input
+      style="width:300px"
+      type="text"
+      id="rootUrl"
+      value="http://0.0.0.0:5000"
+    />
+    <H3>Step 2: Populate choices from the /choices endpoint</H3>
+    <button onclick="getChoices()">
+      Start Game!
+    </button>
+    <div id="choices">
+      <ul id="choicesList"></ul>
+    </div>
+    <H3
+      >Step 3: Click an above choice to play against the computer with the /play
+      endpoint</H3
+    >
+
+    <div id="results" class = "relative">
+
+    </div>
+    <div id="tenRecent"></div>
+    <H3>Random Choice</H3>
+    <div id="choice">
+      <button onclick="getChoice()">
+        Get Random Choice from /choice endpoint
+      </button>
+      <p id="choiceTag"></p>
+    </div>
+    <button
+      id="butwhy"
+      onclick="alert('We just want to keep it nice and lo-fi :)')"
+    >
+      Why this page is so simple?
+    </button>
+    <style>
+div.relative {
+  position: absolute;
+  top: 350px;
+  right: 100px;
+  width: 300px;
+  height: 100px;
+  <!--border: 3px solid #73AD21;-->
+}
+
+div.absolute {
+  position: absolute;
+  top: 80px;
+  right: 100px;
+  width: 200px;
+  height: 100px;
+  <!--border: 3px solid #73AD21;-->
+  background-color:lightblue;
+}
+</style>
+  <div id = "score" class = "absolute">
+  <h3>ScoreBoard</h3>
+</div>
+  </body>
+
+  <script>
+
+    var listContainer = document.getElementById('score');
+
+    var listElement = document.createElement('ol');
+    listContainer.appendChild(listElement);
+
+    document.addEventListener("keydown", function(event) {
+
+    var key = event.which;
+      console.log(event.which);
+      if(key === 82){
+        console.log("Detected  ");
+        listContainer.removeChild(listElement);
+        listElement = document.createElement('ol');
+    listContainer.appendChild(listElement);
+
+      }
+
+    })
+
+    function rootUrl() {
+      return $("#rootUrl").val();
+    }
+
+    function printChoices(result) {
+      console.log(result);
+    }
+
+    function createChoices(results) {
+      $("#choices ul").empty();
+      for (i in results) {
+        const choiceId = results[i].id;
+        var resultButton = document.createElement("button");
+        resultButton.id = "choice-" + choiceId;
+        resultButton.innerText = results[i].name;
+
+        $("#choices ul").append($("<li>").append(resultButton));
+        resultButton.onclick = function() {
+          playWithChoice(choiceId);
+        };
+      }
+    }
+
+    function getChoice() {
+      $.get({
+        url: rootUrl() + "/choice",
+        success: function(result) {
+          console.log(result);
+          $("#choiceTag").text(result.name);
+        }
+      });
+    }
+
+    function getChoices() {
+      $.get({
+        url: rootUrl() + "/choices",
+        success: function(result) {
+          console.log(result);
+          createChoices(result);
+        }
+      });
+    }
+
+    function playWithChoice(id) {
+      console.log("played with " + id);
+
+      $.post(rootUrl() + "/play", `{"player":` + id + `}`, function(
+        data,
+        status
+      ) {
+        if (status === "success") {
+         <!--$("#tenRecent").-->
+
+            $("#results").text(
+              "Current Score: " +
+              "You played " +
+                data.player +
+                ", the computer played " +
+                data.computer +
+                ". You " +
+                data.results
+            );
+
+
+          var winner = "";
+          if(data.player == data.computer)
+            winner = "tie";
+          else if(data.player > data.computer)
+            winner = "You";
+          else
+            winner = "computer";
+
+          var str = "Game winner: " + winner;
+          listItem = document.createElement('li');
+
+        // Add the item text
+        listItem.innerHTML = str;
+
+
+        if(listElement.childElementCount === 10){
+          listElement.removeChild(listElement.childNodes[0]);
+        }
+
+        // Add listItem to the listElement
+        listElement.appendChild(listItem);
+
+        <!--console.log("listsize: "+ listElement.childElementCount);-->
+
+        } else {
+          alert(status);
+        }
+      });
+    }
+  </script>
+
+
+</html>
