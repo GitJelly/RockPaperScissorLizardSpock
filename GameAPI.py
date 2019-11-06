@@ -1,7 +1,7 @@
 from flask import Flask, jsonify, request
-import requests
 import json
 from flask_cors import CORS, cross_origin
+from HelperMethods import *
 
 app = Flask(__name__)
 CORS(app)
@@ -9,76 +9,46 @@ CORS(app)
 
 @app.route('/choice', methods=['GET'])
 @cross_origin()
-def returnJSONOFCHOICE():
-    # r = urllib.request.urlopen('https://codechallenge.boohma.com/random')  # -> good
-    id = 0
-    PARAMS = {"player": id}
-    r = requests.get('https://codechallenge.boohma.com/random', PARAMS)
-    # randjson = r.
-    # mystr = randjson.decode("utf8")
-    # myjson = json.loads(mystr)
-    myjson = r.json()
-    computermove = myjson['random_number']
-    computermove = computermove % 5 + 1
-    id = computermove
+def return_json_of_choice():
+    computer_move_json = get_computer_move()
+    computer_move = computer_move_json['random_number']
+    computer_move = computer_move % 5 + 1
 
-    if id == 1:
-        movename = "rock"
-    elif id == 2:
-        movename = "paper"
-    elif id == 3:
-        movename = "scissor"
-    elif id == 4:
-        movename = "lizard"
-    else:
-        movename = "spock"
+    move_name = get_movename_given_moveid(computer_move)
 
-    jsontosend = {"id": computermove, "name": movename}
+    id_name_dictionary = {"id": computer_move, "name": move_name}
 
-    return jsontosend
+    return jsonify(id_name_dictionary)
 
 
 @app.route('/choices', methods=['GET'])
 @cross_origin()
-def returnJSONOFCHOICES():
-    toret = ([{"id": 1, "name": "rock"}, {"id": 2, "name": "paper"}, {"id": 3, "name": "scissors"},
+def return_json_of_choices():
+    to_ret = ([{"id": 1, "name": "rock"}, {"id": 2, "name": "paper"}, {"id": 3, "name": "scissors"},
                     {"id": 4, "name": "lizard"}, {"id": 5, "name": "spock"}])
-    return jsonify(toret)
+    return jsonify(to_ret)
 
 
 @app.route('/play', methods=['POST'])
 @cross_origin()
-def moveoutcome():
-    id = 0
-    PARAMS = {"player": id}
-    r = requests.get('https://codechallenge.boohma.com/random', PARAMS)
-    # r = request.urlopen('https://codechallenge.boohma.com/random')  #-> good
-    # randjson = r.read()
-    # mystr = randjson.decode("utf8")
+def move_outcome():
+    my_json = get_computer_move()
+    computer_move = my_json['random_number']
+    computer_move = computer_move % 5
 
-    # myjson = json.loads(mystr)
-    myjson = r.json()
-    computermove = myjson['random_number']
-    computermove = computermove % 5
     data = request.get_data()
     data = request.data
 
-    datatostring = data.decode("utf8")
+    data_to_string = data.decode("utf8")
+    player_choice = json.loads(data_to_string)
+    player_choice = player_choice.get("player")
 
-    playerchoice = json.loads(datatostring)
+    player_move_name = get_movename_given_moveid(player_choice)
+    computer_move_name = get_movename_given_moveid(computer_move)
 
-    playerchoice = playerchoice.get("player")
+    fin_response = get_result(player_move_name, computer_move_name)
 
-    if playerchoice < computermove:
-        gameoutcome = "loose"
-    elif playerchoice > computermove:
-        gameoutcome = "win"
-    else:
-        gameoutcome = "tie"
-
-    finresponse = {"results": gameoutcome, "player": playerchoice, "computer": computermove}
-
-    return jsonify(finresponse)
+    return jsonify(fin_response)
 
 
 if __name__ == "__main__":
